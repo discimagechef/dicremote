@@ -32,31 +32,27 @@ static u_int32_t AtaProtocolToCamFlags(uint8_t protocol)
         case AARUREMOTE_ATA_PROTOCOL_HARD_RESET:
         case AARUREMOTE_ATA_PROTOCOL_NO_DATA:
         case AARUREMOTE_ATA_PROTOCOL_SOFT_RESET:
-        case AARUREMOTE_ATA_PROTOCOL_RETURN_RESPONSE: return CAM_DIR_NONE;
+        case AARUREMOTE_ATA_PROTOCOL_RETURN_RESPONSE:
+            return CAM_DIR_NONE;
         case AARUREMOTE_ATA_PROTOCOL_PIO_IN:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_IN: return CAM_DIR_IN;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
+            return CAM_DIR_IN;
         case AARUREMOTE_ATA_PROTOCOL_PIO_OUT:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT: return CAM_DIR_OUT;
-        default: return 0;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT:
+            return CAM_DIR_OUT;
+        default:
+            return 0;
     }
 }
 
-int32_t SendAtaChsCommand(void*                 device_ctx,
-                          AtaRegistersChs       registers,
-                          AtaErrorRegistersChs* error_registers,
-                          uint8_t               protocol,
-                          uint8_t               transfer_register,
-                          char*                 buffer,
-                          uint32_t              timeout,
-                          uint8_t               transfer_blocks,
-                          uint32_t*             duration,
-                          uint32_t*             sense,
-                          uint32_t*             buf_len)
+int32_t SendAtaChsCommand(void *device_ctx, AtaRegistersChs registers, AtaErrorRegistersChs *error_registers,
+                          uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                          uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     *duration          = 0;
     *sense             = false;
-    union ccb*      camccb;
+    union ccb      *camccb;
     int             error;
     int             clock_error;
     struct timespec start_tp;
@@ -76,7 +72,7 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
     camccb->ccb_h.retry_count = 1;
     camccb->ccb_h.cbfcnp      = NULL;
     camccb->ccb_h.timeout     = timeout;
-    camccb->ataio.data_ptr    = (u_int8_t*)buffer;
+    camccb->ataio.data_ptr    = (u_int8_t *)buffer;
     camccb->ataio.dxfer_len   = *buf_len;
     camccb->ccb_h.flags |= CAM_DEV_QFRZDIS;
     camccb->ataio.cmd.flags = CAM_ATAIO_NEEDRESULT;
@@ -86,8 +82,12 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
         case AARUREMOTE_ATA_PROTOCOL_DMA:
         case AARUREMOTE_ATA_PROTOCOL_DMA_QUEUED:
         case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT: camccb->ataio.cmd.flags |= CAM_ATAIO_DMA; break;
-        case AARUREMOTE_ATA_PROTOCOL_FPDMA: camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA; break;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_DMA;
+            break;
+        case AARUREMOTE_ATA_PROTOCOL_FPDMA:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA;
+            break;
     }
 
     camccb->ataio.cmd.command      = registers.command;
@@ -142,22 +142,14 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
     return error;
 }
 
-int32_t SendAtaLba28Command(void*                   device_ctx,
-                            AtaRegistersLba28       registers,
-                            AtaErrorRegistersLba28* error_registers,
-                            uint8_t                 protocol,
-                            uint8_t                 transfer_register,
-                            char*                   buffer,
-                            uint32_t                timeout,
-                            uint8_t                 transfer_blocks,
-                            uint32_t*               duration,
-                            uint32_t*               sense,
-                            uint32_t*               buf_len)
+int32_t SendAtaLba28Command(void *device_ctx, AtaRegistersLba28 registers, AtaErrorRegistersLba28 *error_registers,
+                            uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                            uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     *duration          = 0;
     *sense             = false;
-    union ccb*      camccb;
+    union ccb      *camccb;
     int             error;
     int             clock_error;
     struct timespec start_tp;
@@ -177,7 +169,7 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
     camccb->ccb_h.retry_count = 1;
     camccb->ccb_h.cbfcnp      = NULL;
     camccb->ccb_h.timeout     = timeout;
-    camccb->ataio.data_ptr    = (u_int8_t*)buffer;
+    camccb->ataio.data_ptr    = (u_int8_t *)buffer;
     camccb->ataio.dxfer_len   = *buf_len;
     camccb->ccb_h.flags |= CAM_DEV_QFRZDIS;
     camccb->ataio.cmd.flags = CAM_ATAIO_NEEDRESULT;
@@ -187,8 +179,12 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
         case AARUREMOTE_ATA_PROTOCOL_DMA:
         case AARUREMOTE_ATA_PROTOCOL_DMA_QUEUED:
         case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT: camccb->ataio.cmd.flags |= CAM_ATAIO_DMA; break;
-        case AARUREMOTE_ATA_PROTOCOL_FPDMA: camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA; break;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_DMA;
+            break;
+        case AARUREMOTE_ATA_PROTOCOL_FPDMA:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA;
+            break;
     }
 
     camccb->ataio.cmd.command      = registers.command;
@@ -243,22 +239,14 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
     return error;
 }
 
-int32_t SendAtaLba48Command(void*                   device_ctx,
-                            AtaRegistersLba48       registers,
-                            AtaErrorRegistersLba48* error_registers,
-                            uint8_t                 protocol,
-                            uint8_t                 transfer_register,
-                            char*                   buffer,
-                            uint32_t                timeout,
-                            uint8_t                 transfer_blocks,
-                            uint32_t*               duration,
-                            uint32_t*               sense,
-                            uint32_t*               buf_len)
+int32_t SendAtaLba48Command(void *device_ctx, AtaRegistersLba48 registers, AtaErrorRegistersLba48 *error_registers,
+                            uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                            uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     *duration          = 0;
     *sense             = false;
-    union ccb*      camccb;
+    union ccb      *camccb;
     int             error;
     int             clock_error;
     struct timespec start_tp;
@@ -280,7 +268,7 @@ int32_t SendAtaLba48Command(void*                   device_ctx,
     camccb->ccb_h.retry_count = 1;
     camccb->ccb_h.cbfcnp      = NULL;
     camccb->ccb_h.timeout     = timeout;
-    camccb->ataio.data_ptr    = (u_int8_t*)buffer;
+    camccb->ataio.data_ptr    = (u_int8_t *)buffer;
     camccb->ataio.dxfer_len   = *buf_len;
     camccb->ccb_h.flags |= CAM_DEV_QFRZDIS;
     camccb->ataio.cmd.flags = CAM_ATAIO_NEEDRESULT | CAM_ATAIO_48BIT;
@@ -290,8 +278,12 @@ int32_t SendAtaLba48Command(void*                   device_ctx,
         case AARUREMOTE_ATA_PROTOCOL_DMA:
         case AARUREMOTE_ATA_PROTOCOL_DMA_QUEUED:
         case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT: camccb->ataio.cmd.flags |= CAM_ATAIO_DMA; break;
-        case AARUREMOTE_ATA_PROTOCOL_FPDMA: camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA; break;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_DMA;
+            break;
+        case AARUREMOTE_ATA_PROTOCOL_FPDMA:
+            camccb->ataio.cmd.flags |= CAM_ATAIO_FPDMA;
+            break;
     }
 
     camccb->ataio.cmd.command          = registers.command;

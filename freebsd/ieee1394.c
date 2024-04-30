@@ -19,12 +19,8 @@
 
 #include "../aaruremote.h"
 
-uint8_t GetFireWireData(void*     device_ctx,
-                        uint32_t* id_model,
-                        uint32_t* id_vendor,
-                        uint64_t* guid,
-                        char*     vendor,
-                        char*     model)
+uint8_t GetFireWireData(void *device_ctx, uint32_t *id_model, uint32_t *id_vendor, uint64_t *guid, char *vendor,
+                        char *model)
 {
     return 0;
 }

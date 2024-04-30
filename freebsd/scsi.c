@@ -25,24 +25,16 @@
 #include "../aaruremote.h"
 #include "freebsd.h"
 
-int32_t SendScsiCommand(void*     device_ctx,
-                        char*     cdb,
-                        char*     buffer,
-                        char**    sense_buffer,
-                        uint32_t  timeout,
-                        int32_t   direction,
-                        uint32_t* duration,
-                        uint32_t* sense,
-                        uint32_t  cdb_len,
-                        uint32_t* buf_len,
-                        uint32_t* sense_len)
+int32_t SendScsiCommand(void *device_ctx, char *cdb, char *buffer, char **sense_buffer, uint32_t timeout,
+                        int32_t direction, uint32_t *duration, uint32_t *sense, uint32_t cdb_len, uint32_t *buf_len,
+                        uint32_t *sense_len)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     *sense_len         = 0;
     *sense_buffer      = NULL;
     *duration          = 0;
     *sense             = false;
-    union ccb*      camccb;
+    union ccb      *camccb;
     u_int32_t       flags;
     int             error;
     int             clock_error;
@@ -52,10 +44,18 @@ int32_t SendScsiCommand(void*     device_ctx,
 
     switch(direction)
     {
-        case AARUREMOTE_SCSI_DIRECTION_NONE: flags = CAM_DIR_NONE; break;
-        case AARUREMOTE_SCSI_DIRECTION_OUT: flags = CAM_DIR_OUT; break;
-        case AARUREMOTE_SCSI_DIRECTION_IN: flags = CAM_DIR_IN; break;
-        case AARUREMOTE_SCSI_DIRECTION_INOUT: flags = CAM_DIR_BOTH; break;
+        case AARUREMOTE_SCSI_DIRECTION_NONE:
+            flags = CAM_DIR_NONE;
+            break;
+        case AARUREMOTE_SCSI_DIRECTION_OUT:
+            flags = CAM_DIR_OUT;
+            break;
+        case AARUREMOTE_SCSI_DIRECTION_IN:
+            flags = CAM_DIR_IN;
+            break;
+        case AARUREMOTE_SCSI_DIRECTION_INOUT:
+            flags = CAM_DIR_BOTH;
+            break;
     }
 
     if(!ctx) return -1;
@@ -75,16 +75,17 @@ int32_t SendScsiCommand(void*     device_ctx,
     camccb->ccb_h.retry_count = 1;
     camccb->ccb_h.cbfcnp      = NULL;
     camccb->ccb_h.timeout     = timeout;
-    camccb->csio.data_ptr     = (u_int8_t*)buffer;
+    camccb->csio.data_ptr     = (u_int8_t *)buffer;
     camccb->csio.dxfer_len    = *buf_len;
     camccb->csio.sense_len    = 32;
     camccb->csio.cdb_len      = cdb_len;
     camccb->csio.tag_action   = 0x20;
 
-    if(cdb_len <= CAM_MAX_CDBLEN) memcpy(camccb->csio.cdb_io.cdb_bytes, cdb, cdb_len);
+    if(cdb_len <= CAM_MAX_CDBLEN)
+        memcpy(camccb->csio.cdb_io.cdb_bytes, cdb, cdb_len);
     else
     {
-        camccb->csio.cdb_io.cdb_ptr = (u_int8_t*)cdb;
+        camccb->csio.cdb_io.cdb_ptr = (u_int8_t *)cdb;
         camccb->ccb_h.flags |= CAM_CDB_POINTER;
     }
 
@@ -127,8 +128,7 @@ int32_t SendScsiCommand(void*     device_ctx,
         *sense             = (camccb->ccb_h.status & CAM_STATUS_MASK) == CAM_SCSI_STATUS_ERROR;
         *sense_buffer      = malloc(camccb->csio.sense_len - camccb->csio.sense_resid);
         (*sense_buffer)[0] = camccb->csio.sense_data.error_code;
-        memcpy((*sense_buffer) + 1,
-               camccb->csio.sense_data.sense_buf,
+        memcpy((*sense_buffer) + 1, camccb->csio.sense_data.sense_buf,
                (camccb->csio.sense_len - camccb->csio.sense_resid) - 1);
     }
 

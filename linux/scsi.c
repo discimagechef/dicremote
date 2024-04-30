@@ -24,19 +24,11 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-int32_t SendScsiCommand(void*     device_ctx,
-                        char*     cdb,
-                        char*     buffer,
-                        char**    sense_buffer,
-                        uint32_t  timeout,
-                        int32_t   direction,
-                        uint32_t* duration,
-                        uint32_t* sense,
-                        uint32_t  cdb_len,
-                        uint32_t* buf_len,
-                        uint32_t* sense_len)
+int32_t SendScsiCommand(void *device_ctx, char *cdb, char *buffer, char **sense_buffer, uint32_t timeout,
+                        int32_t direction, uint32_t *duration, uint32_t *sense, uint32_t cdb_len, uint32_t *buf_len,
+                        uint32_t *sense_len)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     sg_io_hdr_t    hdr;
     int            dir, ret;
     *sense_len = 32;
@@ -50,12 +42,20 @@ int32_t SendScsiCommand(void*     device_ctx,
 
     switch(direction)
     {
-        case AARUREMOTE_SCSI_DIRECTION_IN: dir = SG_DXFER_FROM_DEV; break;
-        case AARUREMOTE_SCSI_DIRECTION_OUT: dir = SG_DXFER_TO_DEV; break;
+        case AARUREMOTE_SCSI_DIRECTION_IN:
+            dir = SG_DXFER_FROM_DEV;
+            break;
+        case AARUREMOTE_SCSI_DIRECTION_OUT:
+            dir = SG_DXFER_TO_DEV;
+            break;
         case AARUREMOTE_SCSI_DIRECTION_INOUT:
-        case AARUREMOTE_SCSI_DIRECTION_UNSPECIFIED: dir = SG_DXFER_TO_FROM_DEV; break;
+        case AARUREMOTE_SCSI_DIRECTION_UNSPECIFIED:
+            dir = SG_DXFER_TO_FROM_DEV;
+            break;
         case AARUREMOTE_SCSI_DIRECTION_NONE:
-        default: dir = SG_DXFER_NONE; break;
+        default:
+            dir = SG_DXFER_NONE;
+            break;
     }
 
     hdr.interface_id    = 'S';
@@ -64,17 +64,17 @@ int32_t SendScsiCommand(void*     device_ctx,
     hdr.dxfer_direction = dir;
     hdr.dxfer_len       = *buf_len;
     hdr.dxferp          = buffer;
-    hdr.cmdp            = (unsigned char*)cdb;
-    hdr.sbp             = (unsigned char*)*sense_buffer;
+    hdr.cmdp            = (unsigned char *)cdb;
+    hdr.sbp             = (unsigned char *)*sense_buffer;
     hdr.timeout         = timeout;
     hdr.flags           = SG_FLAG_DIRECT_IO;
 
     ret = ioctl(ctx->fd, SG_IO, &hdr);
 
-    *sense = (hdr.info & SG_INFO_OK_MASK) != SG_INFO_OK;
+    *sense     = (hdr.info & SG_INFO_OK_MASK) != SG_INFO_OK;
     // TODO: Manual timing if duration is 0
     *duration  = hdr.duration;
     *sense_len = hdr.sb_len_wr;
 
-    return ret; // TODO: Implement
+    return ret;  // TODO: Implement
 }

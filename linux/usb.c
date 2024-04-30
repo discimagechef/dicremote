@@ -24,24 +24,18 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-uint8_t GetUsbData(void*     device_ctx,
-                   uint16_t* desc_len,
-                   char*     descriptors,
-                   uint16_t* id_vendor,
-                   uint16_t* id_product,
-                   char*     manufacturer,
-                   char*     product,
-                   char*     serial)
+uint8_t GetUsbData(void *device_ctx, uint16_t *desc_len, char *descriptors, uint16_t *id_vendor, uint16_t *id_product,
+                   char *manufacturer, char *product, char *serial)
 {
-    DeviceContext* ctx = device_ctx;
-    char*          dev_path;
+    DeviceContext *ctx = device_ctx;
+    char          *dev_path;
     char           tmp_path[4096];
     char           resolved_link[4096];
     struct stat    sb;
     ssize_t        len;
-    char*          rchr;
+    char          *rchr;
     int            found = 1;
-    FILE*          file;
+    FILE          *file;
 
     if(!ctx) return -1;
 
@@ -55,7 +49,7 @@ uint8_t GetUsbData(void*     device_ctx,
        strncmp(ctx->device_path, "/dev/st", 7) != 0)
         return 0;
 
-    dev_path = (char*)ctx->device_path + 5;
+    dev_path = (char *)ctx->device_path + 5;
 
     snprintf(tmp_path, 4096, "/sys/block/%s", dev_path);
 

@@ -27,22 +27,11 @@
 #include "linux.h"
 #include "mmc/ioctl.h"
 
-int32_t SendSdhciCommand(void*     device_ctx,
-                         uint8_t   command,
-                         uint8_t   write,
-                         uint8_t   application,
-                         uint32_t  flags,
-                         uint32_t  argument,
-                         uint32_t  block_size,
-                         uint32_t  blocks,
-                         char*     buffer,
-                         uint32_t  buf_len,
-                         uint32_t  timeout,
-                         uint32_t* response,
-                         uint32_t* duration,
-                         uint32_t* sense)
+int32_t SendSdhciCommand(void *device_ctx, uint8_t command, uint8_t write, uint8_t application, uint32_t flags,
+                         uint32_t argument, uint32_t block_size, uint32_t blocks, char *buffer, uint32_t buf_len,
+                         uint32_t timeout, uint32_t *response, uint32_t *duration, uint32_t *sense)
 {
-    DeviceContext*     ctx = device_ctx;
+    DeviceContext     *ctx = device_ctx;
     struct mmc_ioc_cmd mmc_ioc_cmd;
     int32_t            error;
     *duration = 0;
@@ -74,29 +63,22 @@ int32_t SendSdhciCommand(void*     device_ctx,
 
     *sense = error < 0;
 
-    memcpy((char*)response, (char*)&mmc_ioc_cmd.response, sizeof(uint32_t) * 4);
+    memcpy((char *)response, (char *)&mmc_ioc_cmd.response, sizeof(uint32_t) * 4);
 
     return error;
 }
 
-int32_t GetSdhciRegisters(void*     device_ctx,
-                          char**    csd,
-                          char**    cid,
-                          char**    ocr,
-                          char**    scr,
-                          uint32_t* csd_len,
-                          uint32_t* cid_len,
-                          uint32_t* ocr_len,
-                          uint32_t* scr_len)
+int32_t GetSdhciRegisters(void *device_ctx, char **csd, char **cid, char **ocr, char **scr, uint32_t *csd_len,
+                          uint32_t *cid_len, uint32_t *ocr_len, uint32_t *scr_len)
 {
-    DeviceContext* ctx = device_ctx;
-    char*          tmp_string;
-    char*          sysfs_path_csd;
-    char*          sysfs_path_cid;
-    char*          sysfs_path_scr;
-    char*          sysfs_path_ocr;
+    DeviceContext *ctx = device_ctx;
+    char          *tmp_string;
+    char          *sysfs_path_csd;
+    char          *sysfs_path_cid;
+    char          *sysfs_path_scr;
+    char          *sysfs_path_ocr;
     size_t         len;
-    FILE*          file;
+    FILE          *file;
     *csd     = NULL;
     *cid     = NULL;
     *ocr     = NULL;
@@ -149,7 +131,7 @@ int32_t GetSdhciRegisters(void*     device_ctx,
             len = getline(&tmp_string, &n, file);
             if(len > 0)
             {
-                *csd_len = Hexs2Bin(tmp_string, (unsigned char**)csd);
+                *csd_len = Hexs2Bin(tmp_string, (unsigned char **)csd);
 
                 if(*csd_len <= 0)
                 {
@@ -171,7 +153,7 @@ int32_t GetSdhciRegisters(void*     device_ctx,
             len = getline(&tmp_string, &n, file);
             if(len > 0)
             {
-                *cid_len = Hexs2Bin(tmp_string, (unsigned char**)cid);
+                *cid_len = Hexs2Bin(tmp_string, (unsigned char **)cid);
 
                 if(*cid_len <= 0)
                 {
@@ -193,7 +175,7 @@ int32_t GetSdhciRegisters(void*     device_ctx,
             len = getline(&tmp_string, &n, file);
             if(len > 0)
             {
-                *scr_len = Hexs2Bin(tmp_string, (unsigned char**)scr);
+                *scr_len = Hexs2Bin(tmp_string, (unsigned char **)scr);
 
                 if(*scr_len <= 0)
                 {
@@ -215,7 +197,7 @@ int32_t GetSdhciRegisters(void*     device_ctx,
             len = getline(&tmp_string, &n, file);
             if(len > 0)
             {
-                *ocr_len = Hexs2Bin(tmp_string, (unsigned char**)ocr);
+                *ocr_len = Hexs2Bin(tmp_string, (unsigned char **)ocr);
 
                 if(*ocr_len <= 0)
                 {
@@ -237,16 +219,13 @@ int32_t GetSdhciRegisters(void*     device_ctx,
     return csd_len != 0 || cid_len != 0 || scr_len != 0 || ocr_len != 0;
 }
 
-int32_t SendMultiSdhciCommand(void*            device_ctx,
-                              uint64_t         count,
-                              MmcSingleCommand commands[],
-                              uint32_t*        duration,
-                              uint32_t*        sense)
+int32_t SendMultiSdhciCommand(void *device_ctx, uint64_t count, MmcSingleCommand commands[], uint32_t *duration,
+                              uint32_t *sense)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     *duration          = 0;
     *sense             = 0;
-    struct mmc_ioc_multi_cmd* mmc_ioc_multi_cmd;
+    struct mmc_ioc_multi_cmd *mmc_ioc_multi_cmd;
     uint64_t                  i;
     int32_t                   error;
     if(!ctx) return -1;
@@ -279,7 +258,7 @@ int32_t SendMultiSdhciCommand(void*            device_ctx,
             mmc_ioc_multi_cmd->cmds[i].cmd_timeout_ms  = commands[i].timeout * 1000;
         }
          */
-        mmc_ioc_multi_cmd->cmds[i].data_ptr = (uint64_t)commands[i].buffer;
+        mmc_ioc_multi_cmd->cmds[i].data_ptr   = (uint64_t)commands[i].buffer;
     }
 
     error = ioctl(ctx->fd, MMC_IOC_MULTI_CMD, mmc_ioc_multi_cmd);
@@ -289,7 +268,7 @@ int32_t SendMultiSdhciCommand(void*            device_ctx,
     *sense = error < 0;
 
     for(i = 0; i < count; i++)
-        memcpy((char*)commands[i].response, (char*)mmc_ioc_multi_cmd->cmds[i].response, sizeof(uint32_t) * 4);
+        memcpy((char *)commands[i].response, (char *)mmc_ioc_multi_cmd->cmds[i].response, sizeof(uint32_t) * 4);
 
     return error;
 }

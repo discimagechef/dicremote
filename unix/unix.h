@@ -23,4 +23,4 @@ typedef struct
     int fd;
 } NetworkContext;
 
-#endif // AARUREMOTE_UNIX_UNIX_H_
+#endif  // AARUREMOTE_UNIX_UNIX_H_

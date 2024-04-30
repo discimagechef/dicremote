@@ -26,4 +26,4 @@ typedef struct
     char device_path[4096];
 } DeviceContext;
 
-#endif // AARUREMOTE_LINUX_LINUX_H_
+#endif  // AARUREMOTE_LINUX_LINUX_H_

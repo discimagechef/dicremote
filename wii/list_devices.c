@@ -25,7 +25,7 @@
 #include "../aaruremote.h"
 #include "wii.h"
 
-DeviceInfoList* ListDevices()
+DeviceInfoList *ListDevices()
 {
     DeviceInfoList *list_start = NULL, *list_current = NULL, *list_next = NULL;
     u32             deviceId = 0;
@@ -39,7 +39,7 @@ DeviceInfoList* ListDevices()
     strncpy(list_next->this.vendor, "Nintendo", 256);
     strncpy(list_next->this.model, "Wii NAND", 256);
     strncpy(list_next->this.bus, "NAND", 256);
-    list_next->this.supported = false; // TODO: Implement NAND reading
+    list_next->this.supported = false;  // TODO: Implement NAND reading
 
     if(ES_GetDeviceID(&deviceId) < 0) snprintf(list_next->this.serial, 256, "%d", deviceId);
 
@@ -59,7 +59,7 @@ DeviceInfoList* ListDevices()
             strncpy(list_next->this.vendor, "Nintendo", 256);
             strncpy(list_next->this.model, "Wii SD", 256);
             strncpy(list_next->this.bus, "MMC/SD", 256);
-            list_next->this.supported = false; // TODO: Implement SD/MMC reading
+            list_next->this.supported = false;  // TODO: Implement SD/MMC reading
             list_current->next        = list_next;
             list_current              = list_next;
         }

@@ -19,7 +19,7 @@
 #define AARUREMOTE_FREEBSD_FREEBSD_H_
 
 // Included here as it seems to need to be after all others
-#ifndef	_STDIO_H_
+#ifndef _STDIO_H_
 #include <stdio.h>
 #endif
 
@@ -28,7 +28,7 @@
 typedef struct
 {
     char               device_path[4096];
-    struct cam_device* device;
+    struct cam_device *device;
 } DeviceContext;
 
-#endif // AARUREMOTE_FREEBSD_FREEBSD_H_
+#endif  // AARUREMOTE_FREEBSD_FREEBSD_H_

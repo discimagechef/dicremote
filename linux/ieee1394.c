@@ -24,22 +24,18 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-uint8_t GetFireWireData(void*     device_ctx,
-                        uint32_t* id_model,
-                        uint32_t* id_vendor,
-                        uint64_t* guid,
-                        char*     vendor,
-                        char*     model)
+uint8_t GetFireWireData(void *device_ctx, uint32_t *id_model, uint32_t *id_vendor, uint64_t *guid, char *vendor,
+                        char *model)
 {
-    DeviceContext* ctx = device_ctx;
-    char*          dev_path;
+    DeviceContext *ctx = device_ctx;
+    char          *dev_path;
     char           tmp_path[4096];
     char           resolved_link[4096];
     struct stat    sb;
     ssize_t        len;
-    char*          rchr;
+    char          *rchr;
     int            found;
-    FILE*          file;
+    FILE          *file;
 
     if(!ctx) return 0;
 
@@ -53,7 +49,7 @@ uint8_t GetFireWireData(void*     device_ctx,
        strncmp(ctx->device_path, "/dev/st", 7) != 0)
         return 0;
 
-    dev_path = (char*)ctx->device_path + 5;
+    dev_path = (char *)ctx->device_path + 5;
 
     snprintf(tmp_path, 4096, "/sys/block/%s", dev_path);
 

@@ -25,9 +25,9 @@
 #include "../aaruremote.h"
 #include "freebsd.h"
 
-void* DeviceOpen(const char* device_path)
+void *DeviceOpen(const char *device_path)
 {
-    DeviceContext* ctx;
+    DeviceContext *ctx;
 
     ctx = malloc(sizeof(DeviceContext));
 
@@ -48,9 +48,9 @@ void* DeviceOpen(const char* device_path)
     return ctx;
 }
 
-void DeviceClose(void* device_ctx)
+void DeviceClose(void *device_ctx)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return;
 
@@ -59,10 +59,10 @@ void DeviceClose(void* device_ctx)
     free(ctx);
 }
 
-int32_t GetDeviceType(void* device_ctx)
+int32_t GetDeviceType(void *device_ctx)
 {
-    DeviceContext* ctx = device_ctx;
-    union ccb*     camccb;
+    DeviceContext *ctx = device_ctx;
+    union ccb     *camccb;
     int            ret;
     int32_t        device_type = AARUREMOTE_DEVICE_TYPE_UNKNOWN;
 
@@ -86,24 +86,34 @@ int32_t GetDeviceType(void* device_ctx)
     switch(camccb->cgd.protocol)
     {
         case PROTO_ATA:
-        case PROTO_SATAPM: device_type = AARUREMOTE_DEVICE_TYPE_ATA; break;
-        case PROTO_ATAPI: device_type = AARUREMOTE_DEVICE_TYPE_ATAPI; break;
-        case PROTO_SCSI: device_type = AARUREMOTE_DEVICE_TYPE_SCSI; break;
-        case PROTO_NVME: device_type = AARUREMOTE_DEVICE_TYPE_NVME; break;
+        case PROTO_SATAPM:
+            device_type = AARUREMOTE_DEVICE_TYPE_ATA;
+            break;
+        case PROTO_ATAPI:
+            device_type = AARUREMOTE_DEVICE_TYPE_ATAPI;
+            break;
+        case PROTO_SCSI:
+            device_type = AARUREMOTE_DEVICE_TYPE_SCSI;
+            break;
+        case PROTO_NVME:
+            device_type = AARUREMOTE_DEVICE_TYPE_NVME;
+            break;
         case PROTO_MMCSD:
             // TODO: MMC vs SD
             device_type = AARUREMOTE_DEVICE_TYPE_MMC;
             break;
-        default: device_type = AARUREMOTE_DEVICE_TYPE_UNKNOWN; break;
+        default:
+            device_type = AARUREMOTE_DEVICE_TYPE_UNKNOWN;
+            break;
     }
 
     cam_freeccb(camccb);
     return device_type;
 }
 
-int32_t ReOpen(void* device_ctx, uint32_t* closeFailed)
+int32_t ReOpen(void *device_ctx, uint32_t *closeFailed)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     int            ret;
     *closeFailed = 0;
 
@@ -116,9 +126,9 @@ int32_t ReOpen(void* device_ctx, uint32_t* closeFailed)
     return ctx->device == 0 ? errno : 0;
 }
 
-int32_t OsRead(void* device_ctx, char* buffer, uint64_t offset, uint32_t length, uint32_t* duration)
+int32_t OsRead(void *device_ctx, char *buffer, uint64_t offset, uint32_t length, uint32_t *duration)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     ssize_t        ret;
     *duration = 0;
     off_t pos;
@@ -131,7 +141,7 @@ int32_t OsRead(void* device_ctx, char* buffer, uint64_t offset, uint32_t length,
     if(pos < 0) return errno;
 
     // TODO: Timing
-    ret = read(ctx->device.fd, (void*)buffer, (size_t)length);
+    ret = read(ctx->device.fd, (void *)buffer, (size_t)length);
 
     return ret < 0 ? errno : 0;
 }

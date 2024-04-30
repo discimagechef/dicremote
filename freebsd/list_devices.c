@@ -25,13 +25,13 @@
 #include "../aaruremote.h"
 #include "freebsd.h"
 
-DeviceInfoList* ListDevices()
+DeviceInfoList *ListDevices()
 {
-    DeviceInfoList *   list_start = NULL, *list_current = NULL, *list_next = NULL;
-    DIR*               dir;
-    struct dirent*     dirent;
-    struct cam_device* camdev;
-    union ccb*         camccb;
+    DeviceInfoList    *list_start = NULL, *list_current = NULL, *list_next = NULL;
+    DIR               *dir;
+    struct dirent     *dirent;
+    struct cam_device *camdev;
+    union ccb         *camccb;
     int                ret;
     int                i;
 
@@ -89,7 +89,7 @@ DeviceInfoList* ListDevices()
             continue;
         }
 
-        strncpy(list_next->this.serial, (const char*)camdev->serial_num, camdev->serial_num_len);
+        strncpy(list_next->this.serial, (const char *)camdev->serial_num, camdev->serial_num_len);
 
         switch(camccb->cgd.protocol)
         {
@@ -98,7 +98,7 @@ DeviceInfoList* ListDevices()
             case PROTO_SATAPM:
                 // TODO: Split on space
                 strncpy(list_next->this.vendor, "ATA", 3);
-                strncpy(list_next->this.model, (const char*)camccb->cgd.ident_data.model, 40);
+                strncpy(list_next->this.model, (const char *)camccb->cgd.ident_data.model, 40);
 
                 // Trim spaces
                 for(i = 40; i > 0; i--)
@@ -108,9 +108,10 @@ DeviceInfoList* ListDevices()
                     list_next->this.model[i] = 0;
                 }
 
-                strncpy(list_next->this.serial, (const char*)camccb->cgd.ident_data.serial, 20);
+                strncpy(list_next->this.serial, (const char *)camccb->cgd.ident_data.serial, 20);
 
-                if(strncmp(camdev->sim_name, "ahcich", 6) == 0) strncpy(list_next->this.bus, "SATA", 5);
+                if(strncmp(camdev->sim_name, "ahcich", 6) == 0)
+                    strncpy(list_next->this.bus, "SATA", 5);
                 else
                     strncpy(list_next->this.bus, "ATA", 4);
 

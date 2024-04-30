@@ -23,9 +23,9 @@
 #include "../aaruremote.h"
 #include "../endian.h"
 
-AaruPacketHello* GetHello()
+AaruPacketHello *GetHello()
 {
-    AaruPacketHello* pkt_server_hello;
+    AaruPacketHello *pkt_server_hello;
 
     pkt_server_hello = malloc(sizeof(AaruPacketHello));
 

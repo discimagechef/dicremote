@@ -29,33 +29,29 @@ int32_t AtaProtocolToScsiDirection(uint8_t protocol)
         case AARUREMOTE_ATA_PROTOCOL_HARD_RESET:
         case AARUREMOTE_ATA_PROTOCOL_NO_DATA:
         case AARUREMOTE_ATA_PROTOCOL_SOFT_RESET:
-        case AARUREMOTE_ATA_PROTOCOL_RETURN_RESPONSE: return AARUREMOTE_SCSI_DIRECTION_NONE;
+        case AARUREMOTE_ATA_PROTOCOL_RETURN_RESPONSE:
+            return AARUREMOTE_SCSI_DIRECTION_NONE;
         case AARUREMOTE_ATA_PROTOCOL_PIO_IN:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_IN: return AARUREMOTE_SCSI_DIRECTION_IN;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
+            return AARUREMOTE_SCSI_DIRECTION_IN;
         case AARUREMOTE_ATA_PROTOCOL_PIO_OUT:
-        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT: return AARUREMOTE_SCSI_DIRECTION_OUT;
-        default: return AARUREMOTE_SCSI_DIRECTION_UNSPECIFIED;
+        case AARUREMOTE_ATA_PROTOCOL_UDMA_OUT:
+            return AARUREMOTE_SCSI_DIRECTION_OUT;
+        default:
+            return AARUREMOTE_SCSI_DIRECTION_UNSPECIFIED;
     }
 }
 
-int32_t SendAtaChsCommand(void*                 device_ctx,
-                          AtaRegistersChs       registers,
-                          AtaErrorRegistersChs* error_registers,
-                          uint8_t               protocol,
-                          uint8_t               transfer_register,
-                          char*                 buffer,
-                          uint32_t              timeout,
-                          uint8_t               transfer_blocks,
-                          uint32_t*             duration,
-                          uint32_t*             sense,
-                          uint32_t*             buf_len)
+int32_t SendAtaChsCommand(void *device_ctx, AtaRegistersChs registers, AtaErrorRegistersChs *error_registers,
+                          uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                          uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
     *duration = 0;
     *sense    = 0;
     unsigned char  cdb[16];
-    char*          sense_buf;
+    char          *sense_buf;
     uint32_t       sense_len;
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return -1;
 
@@ -68,8 +64,12 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
         switch(protocol)
         {
             case AARUREMOTE_ATA_PROTOCOL_PIO_IN:
-            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN: cdb[2] = 0x08; break;
-            default: cdb[2] = 0x00; break;
+            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
+                cdb[2] = 0x08;
+                break;
+            default:
+                cdb[2] = 0x00;
+                break;
         }
 
         if(transfer_blocks) cdb[2] |= 0x04;
@@ -85,17 +85,8 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
     cdb[13] = registers.device_head;
     cdb[14] = registers.command;
 
-    int error = SendScsiCommand(ctx,
-                                (char*)cdb,
-                                buffer,
-                                &sense_buf,
-                                timeout,
-                                AtaProtocolToScsiDirection(protocol),
-                                duration,
-                                sense,
-                                16,
-                                buf_len,
-                                &sense_len);
+    int error = SendScsiCommand(ctx, (char *)cdb, buffer, &sense_buf, timeout, AtaProtocolToScsiDirection(protocol),
+                                duration, sense, 16, buf_len, &sense_len);
 
     if(sense_len < 22 || (sense_buf[8] != 0x09 && sense_buf[9] != 0x0C)) return error;
 
@@ -113,24 +104,16 @@ int32_t SendAtaChsCommand(void*                 device_ctx,
     return error;
 }
 
-int32_t SendAtaLba28Command(void*                   device_ctx,
-                            AtaRegistersLba28       registers,
-                            AtaErrorRegistersLba28* error_registers,
-                            uint8_t                 protocol,
-                            uint8_t                 transfer_register,
-                            char*                   buffer,
-                            uint32_t                timeout,
-                            uint8_t                 transfer_blocks,
-                            uint32_t*               duration,
-                            uint32_t*               sense,
-                            uint32_t*               buf_len)
+int32_t SendAtaLba28Command(void *device_ctx, AtaRegistersLba28 registers, AtaErrorRegistersLba28 *error_registers,
+                            uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                            uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
     *duration = 0;
     *sense    = 0;
     unsigned char  cdb[16];
-    char*          sense_buf;
+    char          *sense_buf;
     uint32_t       sense_len;
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return -1;
 
@@ -143,8 +126,12 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
         switch(protocol)
         {
             case AARUREMOTE_ATA_PROTOCOL_PIO_IN:
-            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN: cdb[2] = 0x08; break;
-            default: cdb[2] = 0x00; break;
+            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
+                cdb[2] = 0x08;
+                break;
+            default:
+                cdb[2] = 0x00;
+                break;
         }
 
         if(transfer_blocks) cdb[2] |= 0x04;
@@ -162,17 +149,8 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
     cdb[13] = registers.device_head;
     cdb[14] = registers.command;
 
-    int error = SendScsiCommand(ctx,
-                                (char*)cdb,
-                                buffer,
-                                &sense_buf,
-                                timeout,
-                                AtaProtocolToScsiDirection(protocol),
-                                duration,
-                                sense,
-                                16,
-                                buf_len,
-                                &sense_len);
+    int error = SendScsiCommand(ctx, (char *)cdb, buffer, &sense_buf, timeout, AtaProtocolToScsiDirection(protocol),
+                                duration, sense, 16, buf_len, &sense_len);
 
     if(sense_len < 22 || (sense_buf[8] != 0x09 && sense_buf[9] != 0x0C)) return error;
 
@@ -190,24 +168,16 @@ int32_t SendAtaLba28Command(void*                   device_ctx,
     return error;
 }
 
-int32_t SendAtaLba48Command(void*                   device_ctx,
-                            AtaRegistersLba48       registers,
-                            AtaErrorRegistersLba48* error_registers,
-                            uint8_t                 protocol,
-                            uint8_t                 transfer_register,
-                            char*                   buffer,
-                            uint32_t                timeout,
-                            uint8_t                 transfer_blocks,
-                            uint32_t*               duration,
-                            uint32_t*               sense,
-                            uint32_t*               buf_len)
+int32_t SendAtaLba48Command(void *device_ctx, AtaRegistersLba48 registers, AtaErrorRegistersLba48 *error_registers,
+                            uint8_t protocol, uint8_t transfer_register, char *buffer, uint32_t timeout,
+                            uint8_t transfer_blocks, uint32_t *duration, uint32_t *sense, uint32_t *buf_len)
 {
     *duration = 0;
     *sense    = 0;
     unsigned char  cdb[16];
-    char*          sense_buf;
+    char          *sense_buf;
     uint32_t       sense_len;
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return -1;
 
@@ -221,8 +191,12 @@ int32_t SendAtaLba48Command(void*                   device_ctx,
         switch(protocol)
         {
             case AARUREMOTE_ATA_PROTOCOL_PIO_IN:
-            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN: cdb[2] = 0x08; break;
-            default: cdb[2] = 0x00; break;
+            case AARUREMOTE_ATA_PROTOCOL_UDMA_IN:
+                cdb[2] = 0x08;
+                break;
+            default:
+                cdb[2] = 0x00;
+                break;
         }
 
         if(transfer_blocks) cdb[2] |= 0x04;
@@ -245,17 +219,8 @@ int32_t SendAtaLba48Command(void*                   device_ctx,
     cdb[13] = registers.device_head;
     cdb[14] = registers.command;
 
-    int error = SendScsiCommand(ctx,
-                                (char*)cdb,
-                                buffer,
-                                &sense_buf,
-                                timeout,
-                                AtaProtocolToScsiDirection(protocol),
-                                duration,
-                                sense,
-                                16,
-                                buf_len,
-                                &sense_len);
+    int error = SendScsiCommand(ctx, (char *)cdb, buffer, &sense_buf, timeout, AtaProtocolToScsiDirection(protocol),
+                                duration, sense, 16, buf_len, &sense_len);
 
     if(sense_len < 22 || (sense_buf[8] != 0x09 && sense_buf[9] != 0x0C)) return error;
 

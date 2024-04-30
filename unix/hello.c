@@ -26,11 +26,11 @@
 #include "../aaruremote.h"
 #include "../endian.h"
 
-AaruPacketHello* GetHello()
+AaruPacketHello *GetHello()
 {
     struct utsname   utsname;
     int              ret;
-    AaruPacketHello* pkt_server_hello;
+    AaruPacketHello *pkt_server_hello;
 
     ret = uname(&utsname);
 

@@ -30,9 +30,9 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-void* DeviceOpen(const char* device_path)
+void *DeviceOpen(const char *device_path)
 {
-    DeviceContext* ctx;
+    DeviceContext *ctx;
 
     char *real_device_path = realpath(device_path, NULL);
     if(real_device_path != NULL)
@@ -68,9 +68,9 @@ void* DeviceOpen(const char* device_path)
     return ctx;
 }
 
-void DeviceClose(void* device_ctx)
+void DeviceClose(void *device_ctx)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return;
 
@@ -79,17 +79,17 @@ void DeviceClose(void* device_ctx)
     free(ctx);
 }
 
-int32_t GetDeviceType(void* device_ctx)
+int32_t GetDeviceType(void *device_ctx)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
 
     if(!ctx) return -1;
 
 #ifdef HAS_UDEV
-    struct udev*        udev;
-    struct udev_device* udev_device;
-    const char*         tmp_string;
-    char*               chrptr;
+    struct udev        *udev;
+    struct udev_device *udev_device;
+    const char         *tmp_string;
+    char               *chrptr;
     int32_t             device_type = AARUREMOTE_DEVICE_TYPE_UNKNOWN;
 
     udev = udev_new();
@@ -112,7 +112,7 @@ int32_t GetDeviceType(void* device_ctx)
             {
                 device_type = AARUREMOTE_DEVICE_TYPE_ATA;
 
-                free((void*)tmp_string);
+                free((void *)tmp_string);
                 tmp_string = udev_device_get_property_value(udev_device, "ID_TYPE");
 
                 if(tmp_string)
@@ -120,30 +120,30 @@ int32_t GetDeviceType(void* device_ctx)
                     // TODO: ATAPI removable non optical disks
                     if(strncmp(tmp_string, "cd", 2) == 0) { device_type = AARUREMOTE_DEVICE_TYPE_ATAPI; }
 
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
             }
             else if(strncmp(tmp_string, "mmc", 3) == 0)
             {
-                free((void*)tmp_string);
+                free((void *)tmp_string);
                 tmp_string = malloc(1024);
 
                 device_type = AARUREMOTE_DEVICE_TYPE_MMC;
 
                 if(tmp_string)
                 {
-                    memset((void*)tmp_string, 0, 1024);
-                    snprintf((char*)tmp_string, 1024, "/sys/block/%s/device/scr", chrptr);
+                    memset((void *)tmp_string, 0, 1024);
+                    snprintf((char *)tmp_string, 1024, "/sys/block/%s/device/scr", chrptr);
 
                     if(access(tmp_string, R_OK) == 0) device_type = AARUREMOTE_DEVICE_TYPE_SECURE_DIGITAL;
 
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
             }
             else if(strncmp(tmp_string, "scsi", 4) == 0 || strncmp(tmp_string, "ieee1394", 8) == 0 ||
                     strncmp(tmp_string, "usb", 3) == 0)
             {
-                free((void*)tmp_string);
+                free((void *)tmp_string);
                 tmp_string = udev_device_get_property_value(udev_device, "ID_TYPE");
 
                 if(tmp_string)
@@ -152,12 +152,12 @@ int32_t GetDeviceType(void* device_ctx)
                        strncmp(tmp_string, "optical", 7) == 0)
                         device_type = AARUREMOTE_DEVICE_TYPE_SCSI;
 
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
             }
             else if(strncmp(tmp_string, "nvme", 4) == 0)
             {
-                free((void*)tmp_string);
+                free((void *)tmp_string);
                 device_type = AARUREMOTE_DEVICE_TYPE_NVME;
             }
         }
@@ -168,20 +168,20 @@ int32_t GetDeviceType(void* device_ctx)
     return device_type;
 #else
     int32_t     dev_type = AARUREMOTE_DEVICE_TYPE_UNKNOWN;
-    const char* dev_name;
-    const char* sysfs_path;
-    char*       dev_path;
-    char*       dev_path2;
-    char*       host_no;
-    char*       scsi_path;
-    char*       iscsi_path;
-    char*       spi_path;
-    char*       fc_path;
-    char*       sas_path;
+    const char *dev_name;
+    const char *sysfs_path;
+    char       *dev_path;
+    char       *dev_path2;
+    char       *host_no;
+    char       *scsi_path;
+    char       *iscsi_path;
+    char       *spi_path;
+    char       *fc_path;
+    char       *sas_path;
     int         ret;
-    char*       chrptr;
-    char*       sysfs_path_scr;
-    FILE*       file;
+    char       *chrptr;
+    char       *sysfs_path_scr;
+    FILE       *file;
     size_t      len = 4096;
 
     if(strlen(ctx->device_path) <= 5) return dev_type;
@@ -219,40 +219,40 @@ int32_t GetDeviceType(void* device_ctx)
 
     if(!sysfs_path || !dev_path || !host_no || !scsi_path || !iscsi_path || !spi_path || !fc_path || !sas_path)
     {
-        free((void*)sysfs_path);
-        free((void*)dev_path);
-        free((void*)host_no);
-        free((void*)iscsi_path);
-        free((void*)scsi_path);
-        free((void*)spi_path);
-        free((void*)fc_path);
-        free((void*)sas_path);
+        free((void *)sysfs_path);
+        free((void *)dev_path);
+        free((void *)host_no);
+        free((void *)iscsi_path);
+        free((void *)scsi_path);
+        free((void *)spi_path);
+        free((void *)fc_path);
+        free((void *)sas_path);
         return dev_type;
     }
 
-    memset((void*)sysfs_path, 0, len);
-    memset((void*)dev_path, 0, len);
-    memset((void*)host_no, 0, len);
-    memset((void*)iscsi_path, 0, len);
-    memset((void*)scsi_path, 0, len);
-    memset((void*)spi_path, 0, len);
-    memset((void*)fc_path, 0, len);
-    memset((void*)sas_path, 0, len);
+    memset((void *)sysfs_path, 0, len);
+    memset((void *)dev_path, 0, len);
+    memset((void *)host_no, 0, len);
+    memset((void *)iscsi_path, 0, len);
+    memset((void *)scsi_path, 0, len);
+    memset((void *)spi_path, 0, len);
+    memset((void *)fc_path, 0, len);
+    memset((void *)sas_path, 0, len);
 
-    snprintf((char*)sysfs_path, len, "%s/%s/device", PATH_SYS_DEVBLOCK, dev_name);
+    snprintf((char *)sysfs_path, len, "%s/%s/device", PATH_SYS_DEVBLOCK, dev_name);
 
     ret = readlink(sysfs_path, dev_path, len);
 
     if(ret <= 0)
     {
-        free((void*)sysfs_path);
-        free((void*)dev_path);
-        free((void*)host_no);
-        free((void*)iscsi_path);
-        free((void*)scsi_path);
-        free((void*)spi_path);
-        free((void*)fc_path);
-        free((void*)sas_path);
+        free((void *)sysfs_path);
+        free((void *)dev_path);
+        free((void *)host_no);
+        free((void *)iscsi_path);
+        free((void *)scsi_path);
+        free((void *)spi_path);
+        free((void *)fc_path);
+        free((void *)sas_path);
         return dev_type;
     }
 
@@ -275,14 +275,14 @@ int32_t GetDeviceType(void* device_ctx)
 
     if(!chrptr)
     {
-        free((void*)sysfs_path);
-        free((void*)dev_path);
-        free((void*)host_no);
-        free((void*)iscsi_path);
-        free((void*)scsi_path);
-        free((void*)spi_path);
-        free((void*)fc_path);
-        free((void*)sas_path);
+        free((void *)sysfs_path);
+        free((void *)dev_path);
+        free((void *)host_no);
+        free((void *)iscsi_path);
+        free((void *)scsi_path);
+        free((void *)spi_path);
+        free((void *)fc_path);
+        free((void *)sas_path);
         return dev_type;
     }
 
@@ -339,22 +339,22 @@ int32_t GetDeviceType(void* device_ctx)
         }
     }
 
-    free((void*)sysfs_path);
-    free((void*)dev_path);
-    free((void*)host_no);
-    free((void*)iscsi_path);
-    free((void*)scsi_path);
-    free((void*)spi_path);
-    free((void*)fc_path);
-    free((void*)sas_path);
+    free((void *)sysfs_path);
+    free((void *)dev_path);
+    free((void *)host_no);
+    free((void *)iscsi_path);
+    free((void *)scsi_path);
+    free((void *)spi_path);
+    free((void *)fc_path);
+    free((void *)sas_path);
 
     return dev_type;
 #endif
 }
 
-int32_t ReOpen(void* device_ctx, uint32_t* closeFailed)
+int32_t ReOpen(void *device_ctx, uint32_t *closeFailed)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     int            ret;
     *closeFailed = 0;
 
@@ -375,9 +375,9 @@ int32_t ReOpen(void* device_ctx, uint32_t* closeFailed)
     return ctx->fd <= 0 ? errno : 0;
 }
 
-int32_t OsRead(void* device_ctx, char* buffer, uint64_t offset, uint32_t length, uint32_t* duration)
+int32_t OsRead(void *device_ctx, char *buffer, uint64_t offset, uint32_t length, uint32_t *duration)
 {
-    DeviceContext* ctx = device_ctx;
+    DeviceContext *ctx = device_ctx;
     ssize_t        ret;
     *duration = 0;
     off_t pos;
@@ -390,7 +390,7 @@ int32_t OsRead(void* device_ctx, char* buffer, uint64_t offset, uint32_t length,
     if(pos < 0) return errno;
 
     // TODO: Timing
-    ret = read(ctx->fd, (void*)buffer, (size_t)length);
+    ret = read(ctx->fd, (void *)buffer, (size_t)length);
 
     return ret < 0 ? errno : 0;
 }

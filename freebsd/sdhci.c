@@ -19,42 +19,21 @@
 
 #include "../aaruremote.h"
 
-int32_t SendSdhciCommand(void*     device_ctx,
-                         uint8_t   command,
-                         uint8_t   write,
-                         uint8_t   application,
-                         uint32_t  flags,
-                         uint32_t  argument,
-                         uint32_t  block_size,
-                         uint32_t  blocks,
-                         char*     buffer,
-                         uint32_t  buf_len,
-                         uint32_t  timeout,
-                         uint32_t* response,
-                         uint32_t* duration,
-                         uint32_t* sense)
+int32_t SendSdhciCommand(void *device_ctx, uint8_t command, uint8_t write, uint8_t application, uint32_t flags,
+                         uint32_t argument, uint32_t block_size, uint32_t blocks, char *buffer, uint32_t buf_len,
+                         uint32_t timeout, uint32_t *response, uint32_t *duration, uint32_t *sense)
 {
     return -1;
 }
 
-int32_t GetSdhciRegisters(void*     device_ctx,
-                          char**    csd,
-                          char**    cid,
-                          char**    ocr,
-                          char**    scr,
-                          uint32_t* csd_len,
-                          uint32_t* cid_len,
-                          uint32_t* ocr_len,
-                          uint32_t* scr_len)
+int32_t GetSdhciRegisters(void *device_ctx, char **csd, char **cid, char **ocr, char **scr, uint32_t *csd_len,
+                          uint32_t *cid_len, uint32_t *ocr_len, uint32_t *scr_len)
 {
     return -1;
 }
 
-int32_t SendMultiSdhciCommand(void*            device_ctx,
-                              uint64_t         count,
-                              MmcSingleCommand commands[],
-                              uint32_t*        duration,
-                              uint32_t*        sense)
+int32_t SendMultiSdhciCommand(void *device_ctx, uint64_t count, MmcSingleCommand commands[], uint32_t *duration,
+                              uint32_t *sense)
 {
     return -1;
 }

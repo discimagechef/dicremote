@@ -19,14 +19,8 @@
 
 #include "../aaruremote.h"
 
-uint8_t GetUsbData(void*     device_ctx,
-                   uint16_t* desc_len,
-                   char*     descriptors,
-                   uint16_t* id_vendor,
-                   uint16_t* id_product,
-                   char*     manufacturer,
-                   char*     product,
-                   char*     serial)
+uint8_t GetUsbData(void *device_ctx, uint16_t *desc_len, char *descriptors, uint16_t *id_vendor, uint16_t *id_product,
+                   char *manufacturer, char *product, char *serial)
 {
     return 0;
 }

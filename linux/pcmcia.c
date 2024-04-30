@@ -25,18 +25,18 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-uint8_t GetPcmciaData(void* device_ctx, uint16_t* cis_len, char* cis)
+uint8_t GetPcmciaData(void *device_ctx, uint16_t *cis_len, char *cis)
 {
-    DeviceContext* ctx = device_ctx;
-    char*          dev_path;
+    DeviceContext *ctx = device_ctx;
+    char          *dev_path;
     char           tmp_path[4096];
     char           resolved_link[4096];
     struct stat    sb;
     ssize_t        len;
-    char*          rchr;
-    FILE*          file;
-    DIR*           dir;
-    struct dirent* dent;
+    char          *rchr;
+    FILE          *file;
+    DIR           *dir;
+    struct dirent *dent;
     *cis_len = 0;
 
     if(!ctx) return 0;
@@ -48,7 +48,7 @@ uint8_t GetPcmciaData(void* device_ctx, uint16_t* cis_len, char* cis)
        strncmp(ctx->device_path, "/dev/st", 7) != 0)
         return 0;
 
-    dev_path = (char*)ctx->device_path + 5;
+    dev_path = (char *)ctx->device_path + 5;
 
     snprintf(tmp_path, 4096, "/sys/block/%s", dev_path);
 

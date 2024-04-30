@@ -31,21 +31,21 @@
 #include "../aaruremote.h"
 #include "linux.h"
 
-DeviceInfoList* ListDevices()
+DeviceInfoList *ListDevices()
 {
-    DIR*            dir;
-    struct dirent*  dirent;
+    DIR            *dir;
+    struct dirent  *dirent;
     int             i;
     DeviceInfoList *list_start = NULL, *list_current = NULL, *list_next = NULL;
-    const char*     tmp_string;
-    FILE*           file;
-    char*           line_str;
+    const char     *tmp_string;
+    FILE           *file;
+    char           *line_str;
     size_t          n, ret;
-    char*           chrptr;
+    char           *chrptr;
     int             has_udev = 0;
 #ifdef HAS_UDEV
-    struct udev*        udev;
-    struct udev_device* udev_device;
+    struct udev        *udev;
+    struct udev_device *udev_device;
 
     udev     = udev_new();
     has_udev = udev != 0;
@@ -95,14 +95,14 @@ DeviceInfoList* ListDevices()
                 if(tmp_string)
                 {
                     strncpy(list_next->this.vendor, tmp_string, 256);
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
 
                 tmp_string = udev_device_get_property_value(udev_device, "ID_MODEL");
                 if(tmp_string)
                 {
                     strncpy(list_next->this.model, tmp_string, 256);
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
 
                     for(i = 0; i < 256; i++)
                     {
@@ -116,7 +116,7 @@ DeviceInfoList* ListDevices()
                 if(tmp_string)
                 {
                     strncpy(list_next->this.serial, tmp_string, 256);
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
                 else
                 {
@@ -124,7 +124,7 @@ DeviceInfoList* ListDevices()
                     if(tmp_string)
                     {
                         strncpy(list_next->this.serial, tmp_string, 256);
-                        free((void*)tmp_string);
+                        free((void *)tmp_string);
                     }
                 }
 
@@ -132,11 +132,11 @@ DeviceInfoList* ListDevices()
                 if(tmp_string)
                 {
                     strncpy(list_next->this.bus, tmp_string, 256);
-                    free((void*)tmp_string);
+                    free((void *)tmp_string);
                 }
             }
         }
-#else // Use sysfs
+#else  // Use sysfs
         if(!has_udev && !strstr(dirent->d_name, "loop"))
         {
             memset((void*)tmp_ctx.device_path, 0, 4096);
@@ -144,11 +144,19 @@ DeviceInfoList* ListDevices()
 
             switch(GetDeviceType(&tmp_ctx))
             {
-                case AARUREMOTE_DEVICE_TYPE_ATA: strncpy(list_next->this.bus, "ATA", 256); break;
-                case AARUREMOTE_DEVICE_TYPE_ATAPI: strncpy(list_next->this.bus, "ATAPI", 256); break;
+                case AARUREMOTE_DEVICE_TYPE_ATA:
+                    strncpy(list_next->this.bus, "ATA", 256);
+                    break;
+                case AARUREMOTE_DEVICE_TYPE_ATAPI:
+                    strncpy(list_next->this.bus, "ATAPI", 256);
+                    break;
                 case AARUREMOTE_DEVICE_TYPE_MMC:
-                case AARUREMOTE_DEVICE_TYPE_SECURE_DIGITAL: strncpy(list_next->this.bus, "MMC/SD", 256); break;
-                case AARUREMOTE_DEVICE_TYPE_NVME: strncpy(list_next->this.bus, "NVMe", 256); break;
+                case AARUREMOTE_DEVICE_TYPE_SECURE_DIGITAL:
+                    strncpy(list_next->this.bus, "MMC/SD", 256);
+                    break;
+                case AARUREMOTE_DEVICE_TYPE_NVME:
+                    strncpy(list_next->this.bus, "NVMe", 256);
+                    break;
                 case AARUREMOTE_DEVICE_TYPE_SCSI:
                     tmp_string = malloc(1024);
                     memset((void*)tmp_string, 0, 1024);
@@ -175,10 +183,10 @@ DeviceInfoList* ListDevices()
                             chrptr--;
                         }
 
-                        memset((void*)tmp_string, 0, 1024);
-                        memcpy((void*)tmp_string, chrptr, ret);
-                        snprintf((char*)line_str, 1024, "/sys/class/scsi_host/host%s/proc_name", tmp_string);
-                        memset((void*)tmp_string, 0, 1024);
+                        memset((void *)tmp_string, 0, 1024);
+                        memcpy((void *)tmp_string, chrptr, ret);
+                        snprintf((char *)line_str, 1024, "/sys/class/scsi_host/host%s/proc_name", tmp_string);
+                        memset((void *)tmp_string, 0, 1024);
 
                         file = fopen(line_str, "r");
                         if(file)
@@ -188,7 +196,8 @@ DeviceInfoList* ListDevices()
 
                             if(ret > 0)
                             {
-                                if(strncmp(line_str, "sbp2", 4) == 0) strncpy(list_next->this.bus, "FireWire", 256);
+                                if(strncmp(line_str, "sbp2", 4) == 0)
+                                    strncpy(list_next->this.bus, "FireWire", 256);
                                 else if(strncmp(line_str, "usb-storage", 11) == 0)
                                     strncpy(list_next->this.bus, "USB", 256);
                                 else
@@ -212,14 +221,16 @@ DeviceInfoList* ListDevices()
 
                     free((void*)tmp_string);
                     break;
-                default: memset(&list_next->this.bus, 0, 256); break;
+                default:
+                    memset(&list_next->this.bus, 0, 256);
+                    break;
             }
         }
 #endif
 
         tmp_string = malloc(1024);
-        memset((void*)tmp_string, 0, 1024);
-        snprintf((char*)tmp_string, 1024, "%s/%s/device/vendor", PATH_SYS_DEVBLOCK, dirent->d_name);
+        memset((void *)tmp_string, 0, 1024);
+        snprintf((char *)tmp_string, 1024, "%s/%s/device/vendor", PATH_SYS_DEVBLOCK, dirent->d_name);
 
         if(access(tmp_string, R_OK) == 0 && strlen(list_next->this.vendor) == 0)
         {
@@ -237,7 +248,8 @@ DeviceInfoList* ListDevices()
                     strncpy(list_next->this.vendor, line_str, 256);
                     for(i = 255; i >= 0; i--)
                     {
-                        if(list_next->this.vendor[i] == 0) continue;
+                        if(list_next->this.vendor[i] == 0)
+                            continue;
 
                         else if(list_next->this.vendor[i] == 0x0A || list_next->this.vendor[i] == 0x0D ||
                                 list_next->this.vendor[i] == ' ')
@@ -251,15 +263,12 @@ DeviceInfoList* ListDevices()
                 fclose(file);
             }
         }
-        else if(strncmp(dirent->d_name, "loop", 4) == 0)
-        {
-            strncpy(list_next->this.vendor, "Linux", 256);
-        }
-        free((void*)tmp_string);
+        else if(strncmp(dirent->d_name, "loop", 4) == 0) { strncpy(list_next->this.vendor, "Linux", 256); }
+        free((void *)tmp_string);
 
         tmp_string = malloc(1024);
-        memset((void*)tmp_string, 0, 1024);
-        snprintf((char*)tmp_string, 1024, "%s/%s/device/model", PATH_SYS_DEVBLOCK, dirent->d_name);
+        memset((void *)tmp_string, 0, 1024);
+        snprintf((char *)tmp_string, 1024, "%s/%s/device/model", PATH_SYS_DEVBLOCK, dirent->d_name);
 
         if(access(tmp_string, R_OK) == 0 &&
            (strlen(list_next->this.model) == 0 || strncmp(list_next->this.bus, "ata", 3) == 0))
@@ -278,7 +287,8 @@ DeviceInfoList* ListDevices()
                     strncpy(list_next->this.model, line_str, 256);
                     for(i = 255; i >= 0; i--)
                     {
-                        if(list_next->this.model[i] == 0) continue;
+                        if(list_next->this.model[i] == 0)
+                            continue;
 
                         else if(list_next->this.model[i] == 0x0A || list_next->this.model[i] == 0x0D ||
                                 list_next->this.model[i] == ' ')
@@ -292,15 +302,12 @@ DeviceInfoList* ListDevices()
                 fclose(file);
             }
         }
-        else if(strncmp(dirent->d_name, "loop", 4) == 0)
-        {
-            strncpy(list_next->this.model, "Linux", 256);
-        }
-        free((void*)tmp_string);
+        else if(strncmp(dirent->d_name, "loop", 4) == 0) { strncpy(list_next->this.model, "Linux", 256); }
+        free((void *)tmp_string);
 
         tmp_string = malloc(1024);
-        memset((void*)tmp_string, 0, 1024);
-        snprintf((char*)tmp_string, 1024, "%s/%s/device/serial", PATH_SYS_DEVBLOCK, dirent->d_name);
+        memset((void *)tmp_string, 0, 1024);
+        snprintf((char *)tmp_string, 1024, "%s/%s/device/serial", PATH_SYS_DEVBLOCK, dirent->d_name);
 
         if(access(tmp_string, R_OK) == 0 && (strlen(list_next->this.serial) == 0))
         {
@@ -318,7 +325,8 @@ DeviceInfoList* ListDevices()
                     strncpy(list_next->this.serial, line_str, 256);
                     for(i = 255; i >= 0; i--)
                     {
-                        if(list_next->this.serial[i] == 0) continue;
+                        if(list_next->this.serial[i] == 0)
+                            continue;
 
                         else if(list_next->this.serial[i] == 0x0A || list_next->this.serial[i] == 0x0D ||
                                 list_next->this.serial[i] == ' ')
@@ -332,14 +340,14 @@ DeviceInfoList* ListDevices()
                 fclose(file);
             }
         }
-        free((void*)tmp_string);
+        free((void *)tmp_string);
 
         if(strlen(list_next->this.vendor) == 0 || strncmp(list_next->this.vendor, "ATA", 3) == 0)
         {
             if(strlen(list_next->this.model) > 0)
             {
                 tmp_string = malloc(256);
-                strncpy((void*)tmp_string, list_next->this.model, 256);
+                strncpy((void *)tmp_string, list_next->this.model, 256);
 
                 chrptr = strchr(tmp_string, ' ');
 
@@ -351,14 +359,15 @@ DeviceInfoList* ListDevices()
                     strncpy(list_next->this.model, chrptr + 1, 256 - (chrptr - tmp_string) - 1);
                 }
 
-                free((void*)tmp_string);
+                free((void *)tmp_string);
             }
         }
 
         // TODO: Get better device type from sysfs paths
         if(strlen(list_next->this.bus) == 0)
         {
-            if(strncmp(dirent->d_name, "loop", 4) == 0) strncpy(list_next->this.bus, "loop", 4);
+            if(strncmp(dirent->d_name, "loop", 4) == 0)
+                strncpy(list_next->this.bus, "loop", 4);
             else if(strncmp(dirent->d_name, "nvme", 4) == 0)
                 strncpy(list_next->this.bus, "NVMe", 4);
             else if(strncmp(dirent->d_name, "mmc", 3) == 0)
